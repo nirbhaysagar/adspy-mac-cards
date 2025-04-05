@@ -1,14 +1,15 @@
 
 import React, { useState } from 'react';
 import { useAuth, useSavedAds } from '@/hooks/useSupabase';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Card from '@/components/Card';
 import { Badge } from '@/components/ui/badge';
-import { Bookmark, Calendar, MapPin, Trash2, FileSpreadsheet, FileText, Download } from 'lucide-react';
+import { Bookmark, Calendar, MapPin, Trash2, FileSpreadsheet, FileText, Download, Loader } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { exportToCSV, exportToPDF } from '@/utils/exportUtils';
+import { toast } from '@/components/ui/use-toast';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,8 +34,17 @@ export default function SavedAds() {
     setExporting(true);
     try {
       exportToCSV(savedAds);
+      toast({
+        title: "Export successful",
+        description: "Your ads have been exported to CSV format.",
+      });
     } catch (error) {
       console.error('Error exporting to CSV:', error);
+      toast({
+        title: "Export failed",
+        description: "There was an error exporting your ads to CSV.",
+        variant: "destructive",
+      });
     } finally {
       setExporting(false);
     }
@@ -44,8 +54,17 @@ export default function SavedAds() {
     setExporting(true);
     try {
       exportToPDF(savedAds);
+      toast({
+        title: "Export successful",
+        description: "Your ads have been exported to PDF format.",
+      });
     } catch (error) {
       console.error('Error exporting to PDF:', error);
+      toast({
+        title: "Export failed",
+        description: "There was an error exporting your ads to PDF.",
+        variant: "destructive",
+      });
     } finally {
       setExporting(false);
     }
@@ -62,12 +81,21 @@ export default function SavedAds() {
             <p className="text-gray-600">Manage your collection of saved advertisements</p>
           </div>
           
-          {savedAds.length > 0 && (
+          {user && savedAds.length > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="gap-2">
-                  <Download size={16} />
-                  Export
+                <Button variant="outline" className="gap-2" disabled={exporting}>
+                  {exporting ? (
+                    <>
+                      <Loader size={16} className="animate-spin" />
+                      Exporting...
+                    </>
+                  ) : (
+                    <>
+                      <Download size={16} />
+                      Export
+                    </>
+                  )}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -92,6 +120,7 @@ export default function SavedAds() {
         
         {adsLoading ? (
           <div className="text-center p-8">
+            <Loader size={24} className="animate-spin mx-auto mb-2" />
             <p>Loading your saved ads...</p>
           </div>
         ) : savedAds.length === 0 ? (
@@ -139,7 +168,13 @@ export default function SavedAds() {
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        onClick={() => unsaveAd(savedAd.id)}
+                        onClick={() => {
+                          unsaveAd(savedAd.id);
+                          toast({
+                            title: "Ad removed",
+                            description: "The ad has been removed from your saved collection.",
+                          });
+                        }}
                         className="text-red-600 hover:text-red-700 hover:bg-red-50"
                       >
                         <Trash2 size={16} className="mr-1" /> Remove
