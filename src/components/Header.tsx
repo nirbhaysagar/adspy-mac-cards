@@ -1,32 +1,49 @@
 
 import React from 'react';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useSupabase';
+import { Link } from 'react-router-dom';
+import { BookmarkCheck, LogOut, User } from 'lucide-react';
 
 const Header = () => {
+  const { user, signOut, loading } = useAuth();
+  
   return (
-    <header className="bg-gray-50 py-6 px-4 md:px-8 rounded-lg mb-8">
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
-        <div className="flex items-center mb-4 md:mb-0">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl mr-4 flex items-center justify-center">
-            <svg 
-              className="w-5 h-5 text-white" 
-              xmlns="http://www.w3.org/2000/svg" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" 
-              strokeWidth="2" 
-              strokeLinecap="round" 
-              strokeLinejoin="round"
-            >
-              <path d="M12 20v-6M6 20V10M18 20V4" />
-            </svg>
-          </div>
-          <div>
-            <h1 className="text-xl md:text-2xl font-medium text-gray-800">AdSpy Filter</h1>
-            <p className="text-sm text-gray-500">Show only what matters. Hide the noise.</p>
-          </div>
-        </div>
+    <div className="flex flex-col sm:flex-row items-center justify-between mb-6 py-4 border-b">
+      <div className="mb-4 sm:mb-0">
+        <Link to="/" className="text-2xl font-bold text-blue-600 flex items-center">
+          AdSpy
+        </Link>
       </div>
-    </header>
+      <div className="flex items-center space-x-3">
+        {loading ? (
+          <div className="w-24 h-9 bg-gray-200 rounded animate-pulse"></div>
+        ) : user ? (
+          <>
+            <Button variant="outline" asChild>
+              <Link to="/saved-ads">
+                <BookmarkCheck size={18} className="mr-1" />
+                Saved Ads
+              </Link>
+            </Button>
+            <Button 
+              variant="ghost" 
+              onClick={signOut} 
+              className="text-gray-600 hover:text-gray-800"
+            >
+              <LogOut size={18} />
+            </Button>
+          </>
+        ) : (
+          <Button asChild>
+            <Link to="/auth">
+              <User size={18} className="mr-1" />
+              Sign In
+            </Link>
+          </Button>
+        )}
+      </div>
+    </div>
   );
 };
 

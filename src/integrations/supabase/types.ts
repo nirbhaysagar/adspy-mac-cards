@@ -9,7 +9,68 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      ads: {
+        Row: {
+          account_name: string | null
+          ad_text: string | null
+          email: string | null
+          id: string
+          keywords: string[] | null
+          location: string | null
+          platform: string | null
+          scraped_at: string | null
+        }
+        Insert: {
+          account_name?: string | null
+          ad_text?: string | null
+          email?: string | null
+          id?: string
+          keywords?: string[] | null
+          location?: string | null
+          platform?: string | null
+          scraped_at?: string | null
+        }
+        Update: {
+          account_name?: string | null
+          ad_text?: string | null
+          email?: string | null
+          id?: string
+          keywords?: string[] | null
+          location?: string | null
+          platform?: string | null
+          scraped_at?: string | null
+        }
+        Relationships: []
+      }
+      saved_ads: {
+        Row: {
+          ad_id: string | null
+          id: string
+          saved_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          ad_id?: string | null
+          id?: string
+          saved_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          ad_id?: string | null
+          id?: string
+          saved_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_ads_ad_id_fkey"
+            columns: ["ad_id"]
+            isOneToOne: false
+            referencedRelation: "ads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
