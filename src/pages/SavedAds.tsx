@@ -31,6 +31,15 @@ export default function SavedAds() {
   }
 
   const handleExportCSV = () => {
+    if (savedAds.length === 0) {
+      toast({
+        title: "No ads to export",
+        description: "Save some ads first before exporting.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setExporting(true);
     try {
       exportToCSV(savedAds);
@@ -51,6 +60,15 @@ export default function SavedAds() {
   };
 
   const handleExportPDF = () => {
+    if (savedAds.length === 0) {
+      toast({
+        title: "No ads to export",
+        description: "Save some ads first before exporting.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setExporting(true);
     try {
       exportToPDF(savedAds);
@@ -129,7 +147,7 @@ export default function SavedAds() {
             <h2 className="text-xl font-medium mb-2">No saved ads yet</h2>
             <p className="text-gray-600 mb-4">You haven't saved any ads to your collection.</p>
             <Button asChild>
-              <a href="/">Browse Ads</a>
+              <Link to="/">Browse Ads</Link>
             </Button>
           </div>
         ) : (
