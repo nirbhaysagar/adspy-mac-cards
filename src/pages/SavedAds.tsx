@@ -5,7 +5,7 @@ import { Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Card from '@/components/Card';
 import { Badge } from '@/components/ui/badge';
-import { Bookmark, Calendar, MapPin, Trash2, FileCsv, FileText, Download } from 'lucide-react';
+import { Bookmark, Calendar, MapPin, Trash2, FileSpreadsheet, FileText, Download } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { exportToCSV, exportToPDF } from '@/utils/exportUtils';
@@ -75,7 +75,7 @@ export default function SavedAds() {
                   onClick={handleExportCSV}
                   disabled={exporting || savedAds.length === 0}
                 >
-                  <FileCsv className="mr-2 h-4 w-4" />
+                  <FileSpreadsheet className="mr-2 h-4 w-4" />
                   <span>Export as CSV</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem 
