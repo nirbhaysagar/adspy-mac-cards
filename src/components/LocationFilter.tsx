@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 const countries = [
@@ -41,14 +41,30 @@ const LocationFilter = () => {
   const [countryOpen, setCountryOpen] = useState(false);
   const [stateOpen, setStateOpen] = useState(false);
 
+  // Load saved location filters on component mount
+  useEffect(() => {
+    try {
+      const savedCountry = localStorage.getItem('adFilterCountry');
+      const savedState = localStorage.getItem('adFilterState');
+      
+      if (savedCountry) setSelectedCountry(savedCountry);
+      if (savedState) setSelectedState(savedState);
+    } catch (error) {
+      console.error('Failed to load saved location filters:', error);
+    }
+  }, []);
+
   const handleCountrySelect = (value: string) => {
     setSelectedCountry(value);
-    setSelectedState('');
+    setSelectedState(''); // Reset state when country changes
+    localStorage.setItem('adFilterCountry', value);
+    localStorage.removeItem('adFilterState'); // Clear saved state
     setCountryOpen(false);
   };
 
   const handleStateSelect = (value: string) => {
     setSelectedState(value);
+    localStorage.setItem('adFilterState', value);
     setStateOpen(false);
   };
 

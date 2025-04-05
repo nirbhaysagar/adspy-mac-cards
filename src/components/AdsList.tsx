@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useAds, useSavedAds, useAuth, type Ad } from '@/hooks/useSupabase';
 import Card from '@/components/Card';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,59 @@ export default function AdsList() {
   const { ads, loading: adsLoading } = useAds();
   const { user } = useAuth();
   const { savedAds, saveAd, loading: savedAdsLoading } = useSavedAds(user?.id);
+  
+  // Get active filters from localStorage or default to empty values
+  const activeKeywords = React.useMemo(() => {
+    try {
+      const stored = localStorage.getItem('adFilterKeywords');
+      return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+      return [];
+    }
+  }, []);
+  
+  const activeLocation = React.useMemo(() => {
+    try {
+      const country = localStorage.getItem('adFilterCountry') || '';
+      const state = localStorage.getItem('adFilterState') || '';
+      return { country, state };
+    } catch (error) {
+      return { country: '', state: '' };
+    }
+  }, []);
+  
+  // Filter ads based on keywords and location
+  const filteredAds = useMemo(() => {
+    if (!ads) return [];
+    
+    return ads.filter(ad => {
+      // If no filters are active, show all ads
+      if (activeKeywords.length === 0 && !activeLocation.country) {
+        return true;
+      }
+      
+      // Filter by keywords if any are set
+      const keywordMatch = activeKeywords.length === 0 || 
+        (ad.keywords && ad.keywords.some(keyword => 
+          activeKeywords.some(filterKeyword => 
+            keyword.toLowerCase().includes(filterKeyword.toLowerCase())
+          )
+        ));
+      
+      // Filter by location if set
+      let locationMatch = true;
+      if (activeLocation.country) {
+        locationMatch = ad.location && ad.location.toLowerCase().includes(activeLocation.country.toLowerCase());
+        
+        // If state is selected and country matches, check state too
+        if (locationMatch && activeLocation.state) {
+          locationMatch = ad.location.toLowerCase().includes(activeLocation.state.toLowerCase());
+        }
+      }
+      
+      return keywordMatch && locationMatch;
+    });
+  }, [ads, activeKeywords, activeLocation]);
   
   const savedAdIds = React.useMemo(() => {
     return savedAds.map(sa => sa.ad_id);
@@ -26,17 +79,17 @@ export default function AdsList() {
     );
   }
   
-  if (ads.length === 0) {
+  if (filteredAds.length === 0) {
     return (
       <div className="w-full text-center p-8">
-        <p>No ads found. Please check back later.</p>
+        <p>No matching ads found. Try adjusting your filters or check back later.</p>
       </div>
     );
   }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-      {ads.map((ad) => (
+      {filteredAds.map((ad) => (
         <AdCard 
           key={ad.id} 
           ad={ad} 

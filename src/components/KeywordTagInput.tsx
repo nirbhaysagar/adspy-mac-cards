@@ -1,11 +1,28 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
 const KeywordTagInput = () => {
   const [tags, setTags] = useState<string[]>([]);
   const [input, setInput] = useState('');
   const maxTags = 5;
+
+  // Load saved keywords on component mount
+  useEffect(() => {
+    try {
+      const savedKeywords = localStorage.getItem('adFilterKeywords');
+      if (savedKeywords) {
+        setTags(JSON.parse(savedKeywords));
+      }
+    } catch (error) {
+      console.error('Failed to load saved keywords:', error);
+    }
+  }, []);
+
+  // Save tags to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('adFilterKeywords', JSON.stringify(tags));
+  }, [tags]);
 
   const addTag = () => {
     if (input && !tags.includes(input) && tags.length < maxTags) {
